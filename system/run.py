@@ -1,5 +1,6 @@
 #!/usr/bin/env python
 
+from __future__ import print_function
 import glob
 import importlib
 import os
@@ -47,8 +48,15 @@ def run(include_long_tests=False, capture_results=False, tests=None, filters=Non
             for name in dir(testModule):
                 o = getattr(testModule, name)
 
-                if not (inspect.isclass(o) and issubclass(o, BaseTest) and o is not BaseTest and
-                        o is not SwiftTest and o is not S3Test and o is not APITest and o is not FileSystemEndpointTest):
+                if not (
+                        inspect.isclass(o) and
+                        issubclass(o, BaseTest) and
+                        o is not BaseTest and
+                        o is not SwiftTest and
+                        o is not S3Test and
+                        o is not APITest and
+                        o is not FileSystemEndpointTest
+                ):
                     continue
 
                 newBase = o.__bases__[0]
@@ -96,18 +104,18 @@ def run(include_long_tests=False, capture_results=False, tests=None, filters=Non
     if lastBase is not None:
         lastBase.shutdown_class()
 
-    print "TESTS: %d SUCCESS: %d FAIL: %d SKIP: %d" % (
-        numTests, numTests - numFailed, numFailed, numSkipped)
+    print("TESTS: %d SUCCESS: %d FAIL: %d SKIP: %d" % (
+        numTests, numTests - numFailed, numFailed, numSkipped))
 
     if len(fails) > 0:
-        print "\nFAILURES (%d):" % (len(fails), )
+        print("\nFAILURES (%d):" % (len(fails), ))
 
         for (test, t, typ, val, tb, testModule) in fails:
             doc = t.__doc__ or ''
-            print "%s:%s %s" % (test, t.__class__.__name__,
-                                testModule.__name__ + ": " + doc.strip())
+            print("%s:%s %s" % (test, t.__class__.__name__,
+                                testModule.__name__ + ": " + doc.strip()))
             traceback.print_exception(typ, val, tb)
-            print "=" * 60
+            print("=" * 60)
 
         sys.exit(1)
 
@@ -117,8 +125,8 @@ if __name__ == "__main__":
         try:
             os.environ['APTLY_VERSION'] = os.popen(
                 "make version").read().strip()
-        except BaseException, e:
-            print "Failed to capture current version: ", e
+        except BaseException as e:
+            print("Failed to capture current version: %r" % e)
 
     os.chdir(os.path.realpath(os.path.dirname(sys.argv[0])))
     random.seed()

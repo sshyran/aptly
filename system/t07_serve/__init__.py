@@ -2,12 +2,13 @@
 Testing serving public repo
 """
 
-import httplib
 import os
 import signal
 import subprocess
 import shlex
 import time
+
+from six.moves.http_client import HTTPConnection
 
 from lib import BaseTest
 
@@ -49,7 +50,7 @@ class Serve1Test(BaseTest):
             try:
                 time.sleep(1)
 
-                conn = httplib.HTTPConnection("127.0.0.1", 8765)
+                conn = HTTPConnection("127.0.0.1", 8765)
                 conn.request("GET", "/")
                 r = conn.getresponse()
                 if r.status != 200:
@@ -65,8 +66,8 @@ class Serve1Test(BaseTest):
             if proc.returncode != -2 and proc.returncode != 2:
                 raise Exception("exit code %d != %d (output: %s)" % (proc.returncode, -2, output))
             self.output = output
-        except Exception, e:
-            raise Exception("Running command %s failed: %s" % (self.runCmd, str(e)))
+        except Exception as e:
+            raise Exception("Running command %s failed: %r" % (self.runCmd, e))
 
     def check(self):
         self.check_output()

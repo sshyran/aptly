@@ -2,13 +2,15 @@ dist: xenial
 sudo: required
 
 language: go
+python:
+  - 3.8
 
 go_import_path: github.com/aptly-dev/aptly
 
 addons:
   apt:
     packages:
-    - python-virtualenv
+    - python3-virtualenv
     - graphviz
     - gnupg2
     - gpgv2
@@ -28,26 +30,27 @@ matrix:
       env: RUN_LONG_TESTS=no
   fast_finish: true
   include:
-    - go: 1.11.x
-      env: RUN_LONG_TESTS=no
-    - go: 1.12.x
-      env: RUN_LONG_TESTS=no
-    - go: 1.13.x
-      env: RUN_LONG_TESTS=no
+    # - go: 1.11.x
+    #   env: RUN_LONG_TESTS=no
+    # - go: 1.12.x
+    #   env: RUN_LONG_TESTS=no
+    # - go: 1.13.x
+    #   env: RUN_LONG_TESTS=no
     - go: 1.14.x
       env: RUN_LONG_TESTS=yes
-    - go: 1.15.x
-      env:
-        - RUN_LONG_TESTS=yes
-        - DEPLOY_BINARIES=yes
-        - APTLY_USER=aptly
-        - secure: "ejVss+Ansvk9f237iXVd87KA8N/SkfJkEdr/KCw9WRkVw3M9WyYtFnqpakIUPFT8RsSc7MW+RU4OM90DsbE9dbDIL0oW+t6QH/IfGjNG2HjDiGEWN/tMLeAQTtzPaVqlItJBo0ILMF2K6NrgkYBYU+tZ8gk5w7CuARvAk82d00o="
-    - go: master
-      env: RUN_LONG_TESTS=no
+    # - go: 1.15.x
+    #   env:
+    #     - RUN_LONG_TESTS=yes
+    #     - DEPLOY_BINARIES=yes
+    #     - APTLY_USER=aptly
+    #     - secure: "ejVss+Ansvk9f237iXVd87KA8N/SkfJkEdr/KCw9WRkVw3M9WyYtFnqpakIUPFT8RsSc7MW+RU4OM90DsbE9dbDIL0oW+t6QH/IfGjNG2HjDiGEWN/tMLeAQTtzPaVqlItJBo0ILMF2K6NrgkYBYU+tZ8gk5w7CuARvAk82d00o="
+    # - go: master
+    #   env: RUN_LONG_TESTS=no
 
 before_install:
-  - virtualenv system/env
+  - virtualenv --python=python3 system/env
   - . system/env/bin/activate
+  - python -V
   - pip install six packaging appdirs
   - pip install -U pip setuptools
   - pip install -r system/requirements.txt

@@ -1,7 +1,8 @@
 import requests_unixsocket
 import time
 import os
-import urllib
+
+from six.moves import urllib_parse
 
 from lib import BaseTest
 
@@ -32,7 +33,7 @@ class UnixSocketAPITest(BaseTest):
     """
     def check(self):
         session = requests_unixsocket.Session()
-        r = session.get('http+unix://%s/api/version' % urllib.quote(UnixSocketAPITest.socket_path, safe=''))
+        r = session.get('http+unix://%s/api/version' % urllib_parse.quote(UnixSocketAPITest.socket_path, safe=''))
         # Just needs to come back, we actually don't care much about the code.
         # Only needs to verify that the socket is actually responding.
         self.check_equal(r.json(), {'Version': os.environ['APTLY_VERSION']})

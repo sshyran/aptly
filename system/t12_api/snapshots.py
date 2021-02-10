@@ -1,5 +1,7 @@
 from api_lib import APITest
-from publish import DefaultSigningOptions
+from .publish import DefaultSigningOptions
+
+from six.moves import range
 
 
 class SnapshotsAPITestCreateShowEmpty(APITest):
@@ -242,8 +244,8 @@ class SnapshotsAPITestDiff(APITest):
     GET /api/snapshot/:name/diff/:name2
     """
     def check(self):
-        repos = [self.random_name() for x in xrange(2)]
-        snapshots = [self.random_name() for x in xrange(2)]
+        repos = [self.random_name() for x in range(2)]
+        snapshots = [self.random_name() for x in range(2)]
 
         for repo_name in repos:
             self.check_equal(self.post("/api/repos", json={"Name": repo_name}).status_code, 201)

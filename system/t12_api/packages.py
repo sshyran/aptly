@@ -1,5 +1,6 @@
-import urllib
 from api_lib import APITest
+
+from six.moves import urllib_parse
 
 
 class PackagesAPITestShow(APITest):
@@ -19,7 +20,7 @@ class PackagesAPITestShow(APITest):
         self.check_equal(resp.status_code, 200)
 
         # get information about package
-        resp = self.get("/api/packages/" + urllib.quote('Psource pyspi 0.6.1-1.3 3a8b37cbd9a3559e'))
+        resp = self.get("/api/packages/" + urllib_parse.quote('Psource pyspi 0.6.1-1.3 3a8b37cbd9a3559e'))
         self.check_equal(resp.status_code, 200)
         self.check_equal(resp.json(), {
             'Architecture': 'any',
@@ -40,5 +41,5 @@ class PackagesAPITestShow(APITest):
             'Vcs-Svn': 'svn://svn.tribulaciones.org/srv/svn/pyspi/trunk',
             'Version': '0.6.1-1.3'})
 
-        resp = self.get("/api/packages/" + urllib.quote('Pamd64 no-such-package 1.0 3a8b37cbd9a3559e'))
+        resp = self.get("/api/packages/" + urllib_parse.quote('Pamd64 no-such-package 1.0 3a8b37cbd9a3559e'))
         self.check_equal(resp.status_code, 404)

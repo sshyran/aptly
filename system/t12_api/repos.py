@@ -1,5 +1,5 @@
 from api_lib import APITest
-from publish import DefaultSigningOptions
+from .publish import DefaultSigningOptions
 
 
 class ReposAPITestCreateShow(APITest):

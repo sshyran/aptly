@@ -1,7 +1,8 @@
 import requests_unixsocket
-import urllib
 import os
 import os.path
+
+from six.moves import urllib_parse
 
 from lib import BaseTest
 
@@ -42,5 +43,5 @@ class SystemdAPIHandoverTest(BaseTest):
             print("Skipping test as we failed to setup a listener.")
             return
         session = requests_unixsocket.Session()
-        r = session.get('http+unix://%s/api/version' % urllib.quote(self.socket_path, safe=''))
+        r = session.get('http+unix://%s/api/version' % urllib_parse.quote(self.socket_path, safe=''))
         self.check_equal(r.json(), {'Version': os.environ['APTLY_VERSION']})

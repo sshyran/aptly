@@ -12,13 +12,13 @@ import shlex
 import shutil
 import string
 import threading
-import urllib
 import pprint
-import SocketServer
-import SimpleHTTPServer
+
+import six
+from six.moves import socketserver, SimpleHTTPServer, urllib_parse
 
 
-class ThreadedTCPServer(SocketServer.ThreadingMixIn, SocketServer.TCPServer):
+class ThreadedTCPServer(socketserver.ThreadingMixIn, socketserver.TCPServer):
     pass
 
 
@@ -34,7 +34,7 @@ class FileHTTPServerRequestHandler(SimpleHTTPServer.SimpleHTTPRequestHandler):
         # abandon query parameters
         path = path.split('?', 1)[0]
         path = path.split('#', 1)[0]
-        path = posixpath.normpath(urllib.unquote(path))
+        path = posixpath.normpath(urllib_parse.unquote(path))
         words = path.split('/')
         words = filter(None, words)
         path = self.rootPath
@@ -70,7 +70,7 @@ class GPGFinder(object):
         for executable in executables:
             try:
                 output = subprocess.check_output([executable, "--version"])
-                if expected_version in output:
+                if expected_version in six.ensure_text(output):
                     return executable
             except Exception:
                 pass
@@ -170,12 +170,12 @@ class BaseTest(object):
 
     def prepare_fixture(self):
         if self.fixturePool:
-            os.makedirs(os.path.join(os.environ["HOME"], ".aptly"), 0755)
+            os.makedirs(os.path.join(os.environ["HOME"], ".aptly"), 0o755)
             os.symlink(self.fixturePoolDir, os.path.join(
                 os.environ["HOME"], ".aptly", "pool"))
 
         if self.fixturePoolCopy:
-            os.makedirs(os.path.join(os.environ["HOME"], ".aptly"), 0755)
+            os.makedirs(os.path.join(os.environ["HOME"], ".aptly"), 0o755)
             shutil.copytree(self.fixturePoolDir, os.path.join(
                 os.environ["HOME"], ".aptly", "pool"), ignore=shutil.ignore_patterns(".git"))
 
@@ -205,7 +205,7 @@ class BaseTest(object):
             self.run_cmd(self.runCmd, self.expectedCode))
 
     def _start_process(self, command, stderr=subprocess.STDOUT, stdout=None):
-        if not hasattr(command, "__iter__"):
+        if isinstance(command, six.string_types):
             params = {
                 'files': os.path.join(os.path.dirname(inspect.getsourcefile(BaseTest)), "files"),
                 'changes': os.path.join(os.path.dirname(inspect.getsourcefile(BaseTest)), "changes"),
@@ -232,10 +232,10 @@ class BaseTest(object):
                 if proc.returncode != expected_code:
                     raise Exception("exit code %d != %d (output: %s)" % (
                         proc.returncode, expected_code, output))
-            return output
-        except Exception, e:
-            raise Exception("Running command %s failed: %s" %
-                            (command, str(e)))
+            return six.ensure_text(output)
+        except Exception as e:
+            raise Exception("Running command %s failed: %r" %
+                            (command, e))
 
     def gold_processor(self, gold):
         return gold
@@ -356,8 +356,11 @@ class BaseTest(object):
             b = match_prepare(b)
 
         if a != b:
-            diff = "".join(difflib.unified_diff(
-                [l + "\n" for l in a.split("\n")], [l + "\n" for l in b.split("\n")]))
+            diff = "".join(
+                difflib.unified_diff(
+                    [line + "\n" for line in a.split("\n")],
+                    [line + "\n" for line in b.split("\n")]
+                ))
 
             raise Exception("content doesn't match:\n" + diff + "\n")
 

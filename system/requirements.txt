@@ -1,6 +1,7 @@
 boto
+flake8
+python-swiftclient
 requests
 requests-unixsocket
-python-swiftclient
-flake8
+six
 termcolor
